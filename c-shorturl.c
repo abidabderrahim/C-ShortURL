@@ -95,7 +95,7 @@ int main() {
 
     save_url_mapping(short_url, long_url);
 
-    printf("Shortened URL: http://short.url/%s\n", short_url);
+    printf("Shortened URL: http://localhost:8888/%s\n", short_url);
 
     struct MHD_Daemon *daemon;
 
