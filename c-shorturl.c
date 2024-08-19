@@ -95,18 +95,24 @@ int main() {
 
     save_url_mapping(short_url, long_url);
 
-    printf("Shortened URL: http://localhost:8888/%s\n", short_url);
+    printf("Shortened URL: http://localhost:%d/%s\n", PORT, short_url);
 
     struct MHD_Daemon *daemon;
 
     daemon = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, PORT, NULL, NULL, &handle_request, NULL, MHD_OPTION_END);
     if (daemon == NULL) {
+        fprintf(stderr, "Failed to start server\n");
         return 1;
     }
 
     printf("Server is running on port %d\n", PORT);
-    getchar(); 
 
+    // Infinite loop to keep the server running
+    while (1) {
+        // You could add a sleep here if desired
+    }
+
+    // Stop the daemon (this code is actually unreachable as the while loop is infinite)
     MHD_stop_daemon(daemon);
     return 0;
 }
