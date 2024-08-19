@@ -30,9 +30,10 @@ Ensure that you have the necessary libraries installed:
 ```bash
 sudo apt-get update
 sudo apt-get install libmicrohttpd-dev libssl-dev
-
+```
 ## Execution
-
+```bash
 gcc c-shorturl.c -o url_shortener -lmicrohttpd -lssl -lcrypto
 ./url_shortener
+```
 
