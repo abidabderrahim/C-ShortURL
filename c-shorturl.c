@@ -3,14 +3,14 @@
 		    // malloc , calloc , realloc , free , exit .
 #include <string.h> // standard string library which include function like :
 		    // strlen , strcpy , strcmp .
-#include <openssll/sha.h> // standard library which include SHA function
+#include <openssl/sha.h> // standard library which include SHA function
 			  // to generate SHA256 hashes .
-#include <microhttp.h> // libmicrohttpd used to create http server .
+#include <microhttpd.h> // libmicrohttpd used to create http server .
 
 
 #define PORT 8888
 #define SHORT_URL_LENGTH 6
-#define URL_STRORAGE_FILE "url_mapping.txt"
+#define URL_STORAGE_FILE "url_mapping.txt"
 
 // function to generate a short code using SHA256 Hash for long url .
 void generate_short_code(char *output, const char *long_url){
@@ -33,7 +33,7 @@ void save_url_mapping(const char *short_url, const char *long_url){
 		perror("Failed to open file");
 		return;
 	}
-	fprintf(file, "%s %s\n", short_urll, long_url);
+	fprintf(file, "%s %s\n", short_url, long_url);
 	fclose(file);
 }
 
@@ -42,7 +42,7 @@ char *lookup_long_url(const char *short_url){
 	FILE *file = fopen(URL_STORAGE_FILE, "r");
 	if (file == NULL){
 		perror("Failed to open file");
-		return NULL
+		return NULL;
 	}
 
 	char stored_short_url[SHORT_URL_LENGTH + 1];
@@ -71,44 +71,69 @@ static enum MHD_Result handle_request(void *cls, struct MHD_Connection *connecti
 	if(long_url){
 		struct MHD_Response *response = MHD_create_response_from_buffer(0, NULL, MHD_RESPMEM_PERSISTENT);
 		MHD_add_response_header(response, "Location", long_url);
-		enum MHD_Result ret = MHD_queue_response(connection, MHD_FOUND, response);
+		enum MHD_Result ret = MHD_queue_response(connection, MHD_HTTP_FOUND, response);
 		MHD_destroy_response(response);
 		free(long_url);
 		return ret;
 	}else{
 		const char *not_found = "404 Not Found";
 		struct MHD_Response *response = MHD_create_response_from_buffer(strlen(not_found), (void *) not_found, MHD_RESPMEM_PERSISTENT);
-		enum MHD_Resukt ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
+		enum MHD_Result ret = MHD_queue_response(connection, MHD_HTTP_NOT_FOUND, response);
 		MHD_destroy_response(response);
 		return ret;
 	}
 }
 
-int main(){
-	const char *long_url;
-	chat short_url[SHORT_URL_LENGHT + 1];
+int main() {
+    char long_url[5048];
+    char short_url[SHORT_URL_LENGTH + 1];
 
-	printf("Enter your lng url : ");
-	scanf("%s", long_url);
+    printf("Enter your long URL: ");
+    scanf("%5047s", long_url); 
 
-	generate_short_code(short_url, long_url);
-	save_url_mapping(short_url, long_url);
+    generate_short_code(short_url, long_url);
 
-	printf("Shortened url : http://short.url/%s\n", short_url);
+    save_url_mapping(short_url, long_url);
 
-	struct MHD_Daemon *daemon;
+    printf("Shortened URL: http://short.url/%s\n", short_url);
 
-	daemon = MHD_start_daemon(MHD_USE_SELECT_INTERBALLY, PORT, NULL, NULL, &handle_request, NULL, MHD_OPTION_END);
-	if(daemon == NULL){
-		return 1;
-	}
+    struct MHD_Daemon *daemon;
 
-	printf("Server is running on port %%d\n", PORT);
-	getchar();
+    daemon = MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, PORT, NULL, NULL, &handle_request, NULL, MHD_OPTION_END);
+    if (daemon == NULL) {
+        return 1;
+    }
 
-	MHD_stop_daemon(daemon);
-	return 0;
+    printf("Server is running on port %d\n", PORT);
+    getchar(); 
+
+    MHD_stop_daemon(daemon);
+    return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
